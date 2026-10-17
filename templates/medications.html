@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Medications{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">YOUR ROUTINE</p><h1>Medications</h1><p class="muted">Organize the schedule provided by your healthcare professional.</p></div></div>
+<div class="info-banner"><span>ⓘ</span><div><b>Enter only your prescribed instructions.</b><p>This tool stores the schedule you provide. It does not determine which medicine you need or whether a dose is appropriate.</p></div></div>
+<section class="panel form-panel"><div class="panel-heading"><div><h3>Add a medicine schedule</h3><p>Times use the 24-hour format, such as 08:00, 20:00.</p></div><span class="panel-icon">＋</span></div>
+<form method="post" class="form-grid">
+<label>Medicine name *<input name="name" required maxlength="120" placeholder="Prescribed medicine name"></label>
+<label>Instructions / dose as prescribed<input name="instructions" maxlength="160" placeholder="e.g. instruction exactly as prescribed"></label>
+<label>Frequency<select name="frequency"><option>As prescribed</option><option>Once a day</option><option>Twice a day</option><option>Three times a day</option><option>Other</option></select></label>
+<label>Reminder times *<input name="times" required placeholder="08:00, 20:00"><small>Separate multiple times with commas.</small></label>
+<label class="span-two">Notes (optional)<textarea name="notes" rows="2" maxlength="500" placeholder="Notes copied from your care instructions"></textarea></label>
+<div class="span-two"><button class="btn btn-primary" type="submit">＋ Save medicine schedule</button></div>
+</form></section>
+<div class="section-heading"><div><h2>Saved schedules</h2><p>{{ meds|length }} schedule(s)</p></div></div>
+{% if meds %}<div class="item-list">{% for m in meds %}<article class="data-card"><span class="data-icon">＋</span><div class="data-content"><h3>{{ m.name }}</h3><p>{{ m.instructions or 'Instructions not entered' }} · {{ m.frequency }}<br><b>Reminder times:</b> {{ m.times }}{% if m.notes %}<br>{{ m.notes }}{% endif %}</p></div><form method="post" class="inline-delete" onsubmit="return confirm('Delete this medicine schedule?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="med_id" value="{{ m.id }}"><button class="small-action delete">Delete</button></form></article>{% endfor %}</div>{% else %}<div class="empty-state"><span>＋</span><h3>No schedules yet</h3><p>Use the form above to add a prescribed medicine schedule.</p></div>{% endif %}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Appointments{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">PLAN AHEAD</p><h1>Appointments</h1><p class="muted">Keep doctor visits and follow-up dates in one place.</p></div></div>
+<section class="panel form-panel"><div class="panel-heading"><div><h3>Add an appointment</h3><p>Appointment email reminders are attempted 24 hours before the visit when SMTP is configured.</p></div><span class="panel-icon purple">▣</span></div>
+<form method="post" class="form-grid">
+<label>Appointment title *<input name="title" required maxlength="150" placeholder="e.g. Follow-up visit"></label><label>Doctor / clinic<input name="doctor" maxlength="150" placeholder="Doctor or clinic name"></label>
+<label>Date *<input type="date" name="appt_date" min="{{ today }}" required></label><label>Time<input type="time" name="appt_time"></label>
+<label>Location<input name="location" maxlength="200" placeholder="Clinic or hospital address"></label><label>Notes<textarea name="notes" rows="1" maxlength="500" placeholder="Details to remember"></textarea></label>
+<div class="span-two"><button class="btn btn-primary">＋ Save appointment</button></div>
+</form></section>
+<div class="section-heading"><div><h2>Your appointments</h2><p>{{ appts|length }} saved appointment(s)</p></div></div>
+{% if appts %}<div class="item-list">{% for a in appts %}<article class="data-card"><span class="data-icon purple">▣</span><div class="data-content"><h3>{{ a.title }}</h3><p>{{ a.appt_date }}{% if a.appt_time %} · {{ a.appt_time }}{% endif %}<br>{{ a.doctor or 'Doctor / clinic not specified' }}{% if a.location %}<br>{{ a.location }}{% endif %}{% if a.notes %}<br>{{ a.notes }}{% endif %}</p></div><form method="post" class="inline-delete" onsubmit="return confirm('Delete this appointment?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="appt_id" value="{{ a.id }}"><button class="small-action delete">Delete</button></form></article>{% endfor %}</div>{% else %}<div class="empty-state"><span>▣</span><h3>No appointments yet</h3><p>Add a visit to keep it easy to find later.</p></div>{% endif %}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="welcome-row"><div><p class="eyebrow">YOUR PERSONAL CARE SPACE</p><h1>Good day, {{ user.name.split()[0] }} <span class="sun">✦</span></h1><p class="muted">A little organization can make your care routine feel easier.</p></div><div class="date-pill">◷ <span id="todayDate"></span></div></section>
+<section class="hero-card"><div><p class="hero-kicker">✦ YOUR DAILY CARE PLAN</p><h2>Stay on track,<br>one reminder at a time.</h2><p>Manage the schedule your healthcare professional gave you and keep appointments close at hand.</p><a class="btn btn-light" href="{{ url_for('medications') }}">Manage my medicines →</a></div><div class="hero-art"><div class="hero-orb"></div><div class="hero-med">✚<small>✓</small></div><span class="hero-float">✓ Schedule saved</span></div></section>
+<div class="section-heading"><div><h2>Your overview</h2><p>Here’s what your care plan looks like today.</p></div><a href="{{ url_for('history') }}" class="text-link">View activity →</a></div>
+<div class="stats-grid"><article class="stat-card"><span class="stat-icon">＋</span><span class="stat-label">Medicine schedules</span><b>{{ meds|length }}</b><small>Active schedules</small></article><article class="stat-card"><span class="stat-icon purple">▣</span><span class="stat-label">Upcoming appointments</span><b>{{ appts|length }}</b><small>Future visits saved</small></article><article class="stat-card"><span class="stat-icon amber">◷</span><span class="stat-label">Reminder events</span><b>{{ events|length }}</b><small>Recent tracked reminders</small></article></div>
+<div class="dashboard-grid"><section class="panel"><div class="panel-heading"><div><h3>Today's medicine schedule</h3><p>Based on the times you entered.</p></div><a class="round-add" href="{{ url_for('medications') }}">＋</a></div>
+{% set schedule = [] %}{% for med in meds %}{% for t in med.times.split(',') %}{% set _ = schedule.append((t.strip(),med)) %}{% endfor %}{% endfor %}
+{% if schedule %}<div class="schedule-list">{% for t,med in schedule|sort(attribute=0) %}<div class="schedule-item"><span class="time-box">{{ t }}</span><div class="schedule-info"><b>{{ med.name }}</b><small>{{ med.instructions or med.frequency }}</small></div><span class="schedule-note">Scheduled</span></div>{% endfor %}</div>{% else %}<div class="empty-inline">No medicine schedules yet.<br><a href="{{ url_for('medications') }}">Add your first schedule →</a></div>{% endif %}
+</section><section class="panel"><div class="panel-heading"><div><h3>Upcoming appointments</h3><p>Keep your next visit in view.</p></div><span class="panel-icon purple">▣</span></div>
+{% if appts %}<div class="appointment-list">{% for a in appts[:3] %}<div class="appt-row"><div class="calendar-tile"><small>{{ a.appt_date[5:7] }}</small><b>{{ a.appt_date[8:10] }}</b></div><div><b>{{ a.title }}</b><small>{{ a.appt_date }}{% if a.appt_time %} · {{ a.appt_time }}{% endif %}<br>{{ a.doctor or 'Doctor / clinic not specified' }}</small></div></div>{% endfor %}</div>{% else %}<div class="empty-inline">No upcoming appointments.<br><a href="{{ url_for('appointments') }}">Add an appointment →</a></div>{% endif %}<a class="btn btn-outline full" href="{{ url_for('appointments') }}">View appointments →</a></section></div>
+<section class="panel reminder-panel"><div class="panel-heading"><div><h3>Reminder actions</h3><p>When a scheduled time arrives, acknowledge or snooze the reminder here.</p></div><button class="btn btn-outline" id="refreshReminders" type="button">Refresh</button></div><div id="liveReminders"><div class="empty-inline">Loading reminder events…</div></div></section>
+<div class="safety-banner"><b>ⓘ A helpful reminder, not medical advice</b><p>Use instructions from your doctor or pharmacist. An unacknowledged reminder does not prove a medicine was missed.</p></div>
+{% endblock %}
+{% block scripts %}<script>
+document.getElementById('todayDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+async function loadReminderEvents(){
+  const box=document.getElementById('liveReminders');
+  try {
+    const res=await fetch('{{ url_for("reminder_poll") }}');
+    const events=await res.json();
+    if(!events.length){box.innerHTML='<div class="empty-inline">No reminder events yet. Events appear after a scheduled time arrives while the server is running.</div>';return;}
+    box.innerHTML=events.slice(0,8).map(e=>`<div class="schedule-item"><span class="time-box">${new Date(e.scheduled_for).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span><div class="schedule-info"><b>${escapeText(e.medication_name)}</b><small>${escapeText(e.status)} · ${new Date(e.scheduled_for).toLocaleDateString()}</small></div>${e.status==='Pending'?`<button class="tiny-action" data-event="${e.id}" data-action="acknowledge">Acknowledge</button><button class="tiny-action snooze" data-event="${e.id}" data-action="snooze">Snooze</button>`:''}</div>`).join('');
+  } catch(e) {box.innerHTML='<div class="empty-inline">Could not load reminder events. Make sure the server is running.</div>';}
+}
+function escapeText(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+document.getElementById('refreshReminders').addEventListener('click',loadReminderEvents);
+document.getElementById('liveReminders').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-event]'); if(!b)return;
+  b.disabled=true;
+  try{const res=await fetch(`/reminders/${b.dataset.event}/${b.dataset.action}`,{method:'POST'});const result=await res.json();if(!result.ok)throw new Error(result.error||'Request failed');loadReminderEvents();}
+  catch(err){b.disabled=false;alert('Could not update reminder. Please refresh and try again.');}
+});
+loadReminderEvents();setInterval(loadReminderEvents,30000);
+</script>{% endblock %}

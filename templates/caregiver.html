@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Caregiver settings{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">SHARED SUPPORT</p><h1>Caregiver settings</h1><p class="muted">Choose whether to share reminder updates with someone you trust.</p></div></div>
+<section class="panel settings-panel"><div class="settings-heading"><span class="feature-icon pink">♡</span><div><h3>Optional caregiver alerts</h3><p>Only enable this if you want reminder status shared.</p></div></div>
+<form method="post" class="stack-form">
+<label class="check-row"><input type="checkbox" name="enabled" {{ 'checked' if settings.enabled else '' }}> Enable caregiver email alerts</label>
+<label>Caregiver name<input name="name" value="{{ settings.name }}" maxlength="100" placeholder="e.g. family member"></label>
+<label>Caregiver email<input type="email" name="email" value="{{ settings.email }}" maxlength="200" placeholder="name@example.com"></label>
+<label>Notify after (minutes)<input type="number" name="after_minutes" min="5" max="1440" value="{{ settings.after_minutes or 30 }}"></label>
+<label class="check-row consent"><input type="checkbox" name="consent" {{ 'checked' if settings.consent else '' }}> I consent to sharing reminder status with this caregiver.</label>
+<button class="btn btn-primary">Save caregiver settings</button></form>
+<p class="tiny-muted">Caregiver alerts are only sent if SMTP is configured. An unacknowledged reminder is not proof that a dose was missed.</p></section>
+<div class="safety-banner"><b>Privacy comes first</b><p>Only share information with someone you trust. This student prototype is not a certified healthcare platform.</p></div>
+{% endblock %}

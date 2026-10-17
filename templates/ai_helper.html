@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}AI instruction helper{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">PLAIN-LANGUAGE SUPPORT</p><h1>AI instruction helper</h1><p class="muted">Ask for help understanding instructions you already received from a healthcare professional.</p></div></div>
+<div class="info-banner"><span>✦</span><div><b>Safety rule</b><p>This helper must not prescribe, diagnose, recommend dose changes, or fill in missing clinical instructions. If wording is unclear, ask your clinician or pharmacist.</p></div></div>
+<section class="panel form-panel"><form method="post" class="stack-form"><label>Paste the instruction you want explained<textarea name="instructions" rows="6" required maxlength="5000" placeholder="Paste only the instruction you want help understanding. Remove personal identifiers first."></textarea></label><button class="btn btn-primary">Explain in simple language →</button></form>
+{% if answer %}<div class="answer-card"><h3>Explanation</h3><p>{{ answer }}</p></div>{% endif %}
+<p class="tiny-muted">AI is optional. If no API key is configured, this page explains how to enable it. Avoid entering names, addresses, or other personal health information into an unconfigured demo.</p></section>
+{% endblock %}

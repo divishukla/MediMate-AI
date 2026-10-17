@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f766e"><title>{% block title %}MediMate AI{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+</head>
+<body>
+<div class="layout">
+{% if user %}
+<aside class="sidebar" id="sidebar">
+<a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">✚</span><span><b>MediMate AI</b><small>Care, organized</small></span></a>
+<div class="user-chip"><span class="avatar">{{ user.name[:1]|upper }}</span><span><b>{{ user.name }}</b><small>Patient dashboard</small></span></div>
+<nav>
+<a class="{{ 'active' if request.endpoint=='dashboard' else '' }}" href="{{ url_for('dashboard') }}">▦ <span>Dashboard</span></a>
+<a class="{{ 'active' if request.endpoint=='medications' else '' }}" href="{{ url_for('medications') }}">＋ <span>Medications</span></a>
+<a class="{{ 'active' if request.endpoint=='appointments' else '' }}" href="{{ url_for('appointments') }}">▣ <span>Appointments</span></a>
+<a class="{{ 'active' if request.endpoint=='history' else '' }}" href="{{ url_for('history') }}">◷ <span>Reminder history</span></a>
+<a class="{{ 'active' if request.endpoint=='caregiver' else '' }}" href="{{ url_for('caregiver') }}">♡ <span>Caregiver settings</span></a>
+<a class="{{ 'active' if request.endpoint=='ai_helper' else '' }}" href="{{ url_for('ai_helper') }}">✦ <span>AI instruction helper</span></a>
+</nav>
+<div class="sidebar-note"><span>✦</span><b>Small steps, better routines.</b><p>Keep your prescribed schedule organized in one place.</p></div>
+<form method="post" action="{{ url_for('logout') }}" class="logout-form"><button class="logout">↪ Sign out</button></form>
+</aside>
+{% endif %}
+<main class="main {{ 'with-sidebar' if user else '' }}">
+<header class="topbar">
+{% if user %}<button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button><div class="crumb">Workspace <span>/</span> {{ self.title()|striptags }}</div><div class="top-user"><span class="avatar">{{ user.name[:1]|upper }}</span></div>
+{% else %}<a class="brand small-brand" href="{{ url_for('index') }}"><span class="brand-mark">✚</span><b>MediMate AI</b></a><div class="top-links"><a href="{{ url_for('login') }}">Sign in</a><a class="btn btn-primary" href="{{ url_for('register') }}">Get started</a></div>{% endif %}
+</header>
+<div class="flash-wrap">{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}<button onclick="this.parentElement.remove()" aria-label="Dismiss">×</button></div>{% endfor %}{% endif %}{% endwith %}</div>
+{% block content %}{% endblock %}
+<footer class="footer"><b>✚ MediMate AI</b><span>Supports routines; does not replace healthcare professionals.</span></footer>
+</main>
+</div>
+<script src="{{ url_for('static',filename='app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body></html>

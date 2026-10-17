@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Reminder history{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">YOUR ACTIVITY</p><h1>Reminder history</h1><p class="muted">Records of reminders created by the background scheduler.</p></div></div>
+<div class="info-banner"><span>ⓘ</span><div><b>History is not proof of medication use.</b><p>“Acknowledged” means you clicked the button. It does not verify that a medicine was taken.</p></div></div>
+{% if events %}<div class="item-list">{% for e in events %}<article class="data-card"><span class="data-icon {{ 'purple' if e.status in ['Snoozed','Flagged'] else '' }}">{{ '✓' if e.status=='Acknowledged' else '◷' }}</span><div class="data-content"><h3>{{ e.medication_name }} — {{ e.status }}</h3><p>Scheduled for {{ e.scheduled_for|replace('T',' ') }}{% if e.acknowledged_at %}<br>Acknowledged at {{ e.acknowledged_at|replace('T',' ') }}{% endif %}</p></div><span class="status-chip {{ e.status|lower }}">{{ e.status }}</span></article>{% endfor %}</div>{% else %}<div class="empty-state"><span>◷</span><h3>No reminder events yet</h3><p>Events appear after a scheduled time is reached while the app's scheduler is running.</p></div>{% endif %}
+{% endblock %}

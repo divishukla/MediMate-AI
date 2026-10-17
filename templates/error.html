@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block title %}{{ code }} · MediMate AI{% endblock %}{% block content %}<div class="empty-state show"><span>ⓘ</span><h1>{{ code }}</h1><p>{{ message }}</p><a class="btn btn-primary" href="{{ url_for('dashboard') if user else url_for('index') }}">Go back</a></div>{% endblock %}

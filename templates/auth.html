@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Create account' if mode=='register' else 'Sign in' }} · MediMate AI{% endblock %}
+{% block content %}
+<div class="auth-wrap"><div class="auth-card"><div class="auth-mark">✚</div><p class="eyebrow">{{ 'GET STARTED' if mode=='register' else 'WELCOME BACK' }}</p><h1>{{ 'Create your account' if mode=='register' else 'Sign in to MediMate' }}</h1><p class="muted">{{ 'Set up your personal care space.' if mode=='register' else 'Your care routine is waiting.' }}</p>
+<form method="post" class="stack-form">
+{% if mode=='register' %}<label>Full name<input name="name" required maxlength="100" autocomplete="name" placeholder="Your name"></label>{% endif %}
+<label>Email address<input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></label>
+<label>Password<input name="password" type="password" required minlength="8" autocomplete="{{ 'new-password' if mode=='register' else 'current-password' }}" placeholder="{{ 'At least 8 characters' if mode=='register' else 'Your password' }}"></label>
+<button class="btn btn-primary btn-large full">{{ 'Create account' if mode=='register' else 'Sign in' }} →</button>
+</form><p class="auth-switch">{% if mode=='register' %}Already have an account? <a href="{{ url_for('login') }}">Sign in</a>{% else %}New to MediMate AI? <a href="{{ url_for('register') }}">Create an account</a>{% endif %}</p><p class="tiny-muted">Prototype only: use demo data, not real sensitive medical information.</p></div></div>
+{% endblock %}
